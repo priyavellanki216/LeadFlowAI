@@ -2,25 +2,31 @@
 
 ## 1. Introduction
 
-This document records the prompts used during the development and testing of LeadFlow AI, an AI-powered lead management and follow-up automation application.
+This document records the prompts designed, implemented, tested, and refined during the development of **LeadFlow AI**, an AI-powered lead management and follow-up automation application.
 
-The prompts were designed and refined to perform three main tasks:
+The application uses the Google Gemini API to support three primary AI tasks:
 
-1. Verify communication between the Python application and the Google Gemini API.
+1. Verify communication between the Python application and the Gemini API.
 2. Analyse customer enquiries, identify business requirements, and classify lead priority.
 3. Generate personalised customer follow-up email drafts using the original enquiry and AI-generated analysis.
 
-The development process involved role-based prompting, context-based prompting, structured output instructions, accuracy constraints, and iterative prompt refinement based on observed AI responses.
+The prompt engineering process focused on role-based prompting, contextual information, task decomposition, structured output generation, accuracy constraints, and iterative refinement based on observed AI responses.
+
+The objective was not simply to generate AI responses, but to make those responses useful, relevant, structured, and grounded in the information supplied by customers.
 
 ---
 
-## P-001: Gemini API Connectivity Test
+## 2. P-001: Gemini API Connectivity Test
 
 **AI Tool:** Google Gemini API  
-**Purpose:** Verify that the LeadFlow AI Python application can successfully communicate with Google's Gemini API.  
-**Location in project:** `test_gemini.py`
+**Purpose:** Verify successful communication between the LeadFlow AI Python application and Google's Gemini API.  
+**Implementation File:** `test_gemini.py`
 
-### Original Prompt
+### 2.1 Prompt Objective
+
+Before implementing the core AI features, a basic prompt was used to verify that the application could communicate with Gemini and receive a response.
+
+### 2.2 Original Prompt
 
 ```text
 You are an AI assistant for a business lead management system.
@@ -30,64 +36,94 @@ Reply with exactly:
 Gemini connection successful. LeadFlow AI is ready.
 ```
 
-### Execution
+### 2.3 Execution
 
-The prompt was submitted through the Gemini API using the Python Google GenAI SDK.
+The prompt was submitted to Gemini through the Python Google GenAI SDK.
 
-### Actual AI Response
+The application retrieved the API key from the `.env` configuration and sent the test request.
+
+### 2.4 Actual AI Response
 
 ```text
 Gemini connection successful. LeadFlow AI is ready.
 ```
 
-### Evaluation
+### 2.5 Evaluation
 
-- The API key was successfully detected from the `.env` file.
+The test verified that:
+
+- The Gemini API key was successfully detected from the environment configuration.
 - Gemini accepted the API request.
-- Gemini returned the expected confirmation message.
-- The response was successfully received by the Python application.
+- The expected confirmation message was returned.
+- The Python application successfully received the response.
 
-### Outcome
+### 2.6 Outcome
 
-**Successful.** Gemini API connectivity was verified.
+**Result: Successful.**
 
-### Prompt Refinement
+The Gemini API connection was verified, allowing development and testing of the application's AI-powered functionality to proceed.
+
+### 2.7 Prompt Refinement
 
 No refinement was necessary because the original prompt produced the expected response.
 
-### Evidence
-
-Terminal output from:
-
-```powershell
-python test_gemini.py
-```
+**Evidence:** `python test_gemini.py`
 
 ---
 
-## P-002: AI-Powered Customer Lead Analysis
+## 3. P-002: AI-Powered Customer Lead Analysis
 
 **AI Tool:** Google Gemini API  
 **Model:** `gemini-3.8-flash`  
-**Purpose:** Analyse customer enquiries and classify leads based on their business requirements, intent, and buying signals.  
-**Implementation:** `modules/ai_service.py`  
-**Test file:** `test_ai.py`
+**Purpose:** Analyse customer enquiries, identify business requirements, determine customer intent, and classify lead priority.  
+**Implementation File:** `modules/ai_service.py`  
+**Function:** `analyze_lead()`  
+**Test File:** `test_ai.py`
 
-### Prompt Design Approach
+### 3.1 Prompt Objective
 
-The prompt was designed using the following elements:
+The purpose of this prompt was to transform unstructured customer enquiries into structured lead information that could be stored and displayed by LeadFlow AI.
 
-1. **Role definition:** Establish Gemini as the lead analysis assistant for LeadFlow AI.
-2. **Business context:** Explain that the application manages and automates business leads.
-3. **Dynamic customer inputs:** Supply the customer name, company, and original enquiry.
-4. **Task decomposition:** Divide analysis into category identification, requirement summarisation, intent identification, priority assignment, reasoning, and missing-information identification.
-5. **Classification rules:** Define explicit criteria for Hot, Warm, and Cold priorities.
-6. **Structured output:** Require a JSON response with six specified fields.
-7. **Accuracy constraints:** Prevent invented facts, unsupported urgency, and assumptions about purchasing authority.
+The AI was instructed to evaluate the enquiry using predefined business rules rather than make unsupported assumptions about the customer's buying intentions.
 
-### Original Implemented Prompt
+### 3.2 Prompt Design Approach
 
-The following is the prompt implemented in `analyze_lead()`:
+The prompt incorporated the following techniques:
+
+**1. Role-based prompting**
+
+Defined Gemini as the lead analysis assistant for LeadFlow AI.
+
+**2. Context-based prompting**
+
+Provided the customer's name, company, and original enquiry as input.
+
+**3. Task decomposition**
+
+Separated the analysis into six tasks:
+
+- Identify the enquiry category.
+- Summarise the customer's requirements.
+- Identify customer intent.
+- Assign a lead priority.
+- Explain the priority using supporting evidence.
+- Identify missing information.
+
+**4. Classification rules**
+
+Defined explicit criteria for Hot, Warm, and Cold lead priorities.
+
+**5. Structured output prompting**
+
+Required a JSON response containing six predefined fields so the Python application could parse and validate the result.
+
+**6. Accuracy constraints**
+
+Restricted the AI from inventing facts, assuming confirmed purchases, or inferring unsupported urgency and purchasing authority.
+
+### 3.3 Implemented Prompt
+
+The following prompt is implemented in `analyze_lead()`.
 
 ```text
 You are the lead analysis assistant for LeadFlow AI,
@@ -150,14 +186,14 @@ Allowed priorities:
 Hot, Warm, Cold.
 ```
 
-**Note:** The placeholders are populated dynamically using the customer information submitted through the application.
+**Implementation note:** The placeholders are populated dynamically using the customer information submitted through the application.
 
-### Actual Test Input
+### 3.4 Actual Test Input
 
-**Customer:** Sarah Johnson  
+**Customer Name:** Sarah Johnson  
 **Company:** Green Valley Healthcare
 
-**Enquiry:**
+**Original Customer Enquiry:**
 
 ```text
 We are looking for an automated appointment management
@@ -166,107 +202,143 @@ understand the available features, pricing and
 implementation timeline.
 ```
 
-### Actual AI Output
+### 3.5 Actual AI Analysis Result
 
-**Category:** Healthcare Technology
+The successful test execution returned the following lead analysis:
 
-**Summary:** The customer is seeking an automated appointment management system for Green Valley Healthcare clinic and requested details regarding features, pricing, and the implementation timeline.
+| Field | Actual result |
+|---|---|
+| Category | Healthcare Technology |
+| Priority | Hot |
+| Summary | The customer is seeking an automated appointment management system for Green Valley Healthcare and requested details regarding features, pricing, and implementation timeline. |
+| Intent | Evaluating and planning the implementation of an automated appointment management system. |
+| Reasoning | The customer explicitly requested pricing and implementation information, matching the implemented Hot priority criteria. |
 
-**Intent:** Evaluating and planning the implementation of an automated appointment management system by requesting feature details, pricing, and implementation timelines.
+**Missing information identified:**
 
-**Priority:** Hot
+- Budget constraints.
+- Specific timeline or target launch date.
+- Clinic size, number of practitioners, or appointment volume.
+- Integration requirements with existing healthcare or EHR systems.
+- Decision-making role or purchasing authority.
 
-**Reasoning:** The customer explicitly requests pricing and an implementation timeline for an automated appointment management system, aligning with the pricing and implementation-focused priority criteria.
+### 3.6 Execution and Validation
 
-**Missing Information:**
-
-- Budget constraints
-- Specific timeline or target launch date
-- Clinic size, number of practitioners, or appointment volume
-- Integration requirements with existing healthcare or EHR systems
-- Decision-making role or purchasing authority
-
-### Execution and Validation
+During testing:
 
 - Initial attempts encountered temporary Gemini API `503 UNAVAILABLE` errors.
 - A subsequent execution successfully received a Gemini response.
-- Python successfully parsed the JSON response.
+- Python successfully parsed the returned JSON.
 - The response was checked for all six required fields.
-- Category and priority were validated against the allowed values.
+- The category and priority were validated against the allowed values.
 - Text fields and the missing-information list were validated.
 
-### Evaluation
+### 3.7 Evaluation
 
-The AI identified the healthcare technology category and classified the enquiry as Hot according to the implemented priority rules.
+The AI identified the correct enquiry category as Healthcare Technology and classified the lead as Hot according to the implemented classification rules.
 
-The reasoning referred to the customer's request for pricing and implementation information.
+The reasoning was linked to the customer's explicit request for pricing and implementation information.
 
-The missing-information list identified details that a sales representative could clarify before proceeding.
+The missing-information field also identified details that a sales representative could clarify before proceeding.
 
-The priority is an AI-generated assessment based on predefined criteria. It does not establish that the customer has confirmed a purchase.
+The classification is an AI-generated assessment based on predefined criteria. It does not establish that the customer has confirmed a purchase.
 
-### Outcome
+### 3.8 Outcome
 
-**Successful.** The lead analysis prompt generated structured information that was parsed and validated by the Python application.
+**Result: Successful.**
 
-### Prompt Refinement
+The prompt generated structured lead information that the Python application could parse, validate, and persist in the SQLite database.
 
-No prompt refinement was performed during this test cycle. The temporary `503 UNAVAILABLE` errors were API availability issues rather than prompt-quality issues.
+### 3.9 Prompt Refinement
 
-### Evidence
+No prompt refinement was performed during this test cycle.
 
-Terminal output from:
+The temporary `503 UNAVAILABLE` errors were API availability issues rather than evidence of a prompt-quality problem.
 
-```powershell
-python test_ai.py
-```
+**Evidence:**
+- `modules/ai_service.py`
+- `test_ai.py`
+- `test_db_analysis.py`
 
 ---
 
-## P-003: AI-Powered Customer Follow-Up Email Generation
+## 4. P-003: AI-Powered Customer Follow-Up Email Generation
 
 **AI Tool:** Google Gemini API  
 **Model:** `gemini-3.6-flash`  
-**Purpose:** Generate personalised and context-aware follow-up email drafts based on customer enquiries and AI-generated lead analysis.  
-**Implementation:** `modules/ai_service.py`  
+**Purpose:** Generate personalised and context-aware customer follow-up email drafts.  
+**Implementation File:** `modules/ai_service.py`  
 **Function:** `generate_followup_draft()`
 
-### Prompt Design Approach
+### 4.1 Prompt Objective
 
-The follow-up prompt was designed to generate customer-specific email drafts while ensuring that the generated content remained grounded in the original enquiry.
+The objective was to generate professional follow-up email drafts based on a customer's original enquiry and the lead analysis already performed by LeadFlow AI.
 
-The prompt includes:
+The generated email needed to acknowledge the customer's actual requirements, provide an appropriate next step, and avoid unsupported product claims or business commitments.
 
-1. **Role definition:** Gemini acts as a business communication assistant within LeadFlow AI.
-2. **Customer context:** Customer name, company, and original enquiry are supplied.
-3. **AI-generated context:** Summary and customer intent are provided as supporting information.
-4. **Internal context:** Lead priority is supplied for internal context but must not appear in the customer-facing email.
-5. **Email generation requirements:** Instructions specify the subject, greeting, acknowledgement, relevant next step, concise body, and closing.
-6. **Accuracy constraints:** Prevent unsupported product claims, pricing, guarantees, and business commitments.
-7. **Untrusted input handling:** Customer-provided text must be treated as data, not instructions.
-8. **Human review:** The output must remain an email draft and must not claim that an email has been sent.
+### 4.2 Prompt Design Approach
 
-### Iteration 1: Initial Follow-Up Generation
+The prompt incorporated the following elements:
 
-**Initial objective:** Generate a professional, personalised follow-up email that acknowledges the customer's enquiry, includes a relevant next step, and provides a subject line and closing.
+**1. Role definition**
+
+Defined Gemini as a business communication assistant working within LeadFlow AI.
+
+**2. Customer context**
+
+Provided the customer name, company, and original enquiry.
+
+**3. AI-generated context**
+
+Provided the lead summary and customer intent as supporting information.
+
+**4. Internal information separation**
+
+Provided the lead priority as internal context and explicitly prohibited revealing it in the customer-facing email.
+
+**5. Email structure**
+
+Specified the subject line, greeting, acknowledgement, personalised body, appropriate next step, and professional closing.
+
+**6. Accuracy and trust constraints**
+
+Restricted unsupported product features, pricing, guarantees, implementation timelines, and business commitments.
+
+**7. Human-in-the-loop design**
+
+Required the output to remain an email draft for human review rather than claim that an email had been sent.
+
+### 4.3 Iteration 1: Initial Follow-Up Generation
+
+**Initial objective:** Generate a professional, personalised follow-up email that acknowledged the customer's enquiry, included a relevant next step, and provided a subject line and closing.
 
 **Problem identified during testing:**
 
-The initial generated email included unverified product capabilities, such as automated patient reminders and administrative workload reduction. It also suggested customised pricing and a specific introductory call.
+The initial generated email included unverified product capabilities, including automated patient reminders and administrative workload reduction.
+
+It also suggested customised pricing and a specific introductory call.
 
 These details were not established by the original customer enquiry or verified product information.
 
 **Learning from the first iteration:**
 
-The prompt needed stronger accuracy constraints. A professional-sounding email was not sufficient if it introduced product capabilities or commitments that the application could not verify.
+A professional-sounding email was not sufficient if the generated content introduced product capabilities or commitments that the application could not verify.
 
-**Exact initial prompt:** The earlier initial prompt wording is not retained in the current implementation source, so it is not reproduced as a verbatim prompt.
+The prompt required stronger grounding and accuracy constraints.
 
-### Iteration 2: Refined Follow-Up Prompt
+**Documentation limitation:** The exact wording of the initial P-003 prompt was not retained in the current implementation source. Therefore, it is not reproduced as a verbatim prompt.
 
-The prompt was revised to make the original customer enquiry the primary source of truth and to prevent unsupported statements.
+The issues described above reflect the observed behaviour of the initial generation, not a reconstructed original prompt.
 
-The following is the complete refined prompt implemented in `generate_followup_draft()`:
+### 4.4 Iteration 2: Refined Follow-Up Prompt
+
+The prompt was refined to make the original customer enquiry the primary source of truth.
+
+Additional instructions were introduced to prevent unsupported claims, protect internal information, and encourage clarification when important details were missing.
+
+### 4.5 Complete Refined Implemented Prompt
+
+The following is the refined prompt implemented in `generate_followup_draft()`.
 
 ```text
 You are an expert business communication assistant
@@ -394,20 +466,23 @@ blocks or commentary outside the email draft.
 
 **Implementation note:** The placeholders are populated dynamically using the selected lead's stored information and AI analysis.
 
-### Test Input
+### 4.6 Test Input
 
 **Customer:** Sarah Johnson  
 **Company:** Green Valley Healthcare
 
-**Original enquiry:**
+**Original Enquiry:**
 
 ```text
-The customer requested information about an automated
-appointment management system, including features,
-pricing and implementation timeline.
+We are looking for an automated appointment management
+system for our healthcare clinic. We would like to
+understand the available features, pricing and
+implementation timeline.
 ```
 
-### Actual Refined Output – Observed Result
+The prompt also received the corresponding AI-generated summary, customer intent, and internal lead priority.
+
+### 4.7 Actual Refined Output – Observed Result
 
 The refined generation produced a personalised email that:
 
@@ -416,89 +491,177 @@ The refined generation produced a personalised email that:
 - Asked about the number of practitioners.
 - Asked about integration requirements.
 
-The observed output was more closely aligned with the original enquiry and did not introduce the specific product features, prices, or guarantees identified as problems in the earlier generation.
+The observed result was more closely aligned with the original customer enquiry and did not introduce the specific product features, prices, or guarantees identified as problems in the earlier generation.
 
-### Evaluation
+**Note:** This section documents the observed output characteristics rather than reproducing an exact email transcript.
+
+### 4.8 Evaluation
 
 The refined prompt improved the relevance and grounding of the generated follow-up draft.
 
-The original enquiry was explicitly prioritised as the source of truth. The AI-generated summary and intent were restricted to supporting context.
+The original enquiry was explicitly established as the primary source of truth, while the AI-generated summary and intent were restricted to supporting context.
 
-The additional rules also protected internal lead priority and prevented the email from claiming that a meeting, quotation, or service had already been arranged.
+The additional rules addressed the problems identified in the initial generation by prohibiting:
 
-The generated email remains a draft for human review. The application does not automatically send it.
+- Unsupported product capabilities.
+- Unverified pricing and discounts.
+- Unconfirmed implementation timelines.
+- False claims about arranged meetings or quotations.
+- Disclosure of internal lead priority or AI reasoning.
 
-### Outcome
+The generated email remains a draft for human review. The application does not automatically send customer communications.
 
-**Successful.** The refined prompt was implemented and tested, producing a more relevant and enquiry-focused follow-up draft.
+### 4.9 Outcome
 
-### Further Improvement
+**Result: Successful.**
 
-Continue reviewing generated email wording and formatting, and test the prompt with different enquiry types to evaluate consistency.
+The refined prompt was implemented and tested, producing a more relevant and enquiry-focused follow-up draft.
 
-### Evidence
+### 4.10 Further Improvement
 
-Implementation:
+Further testing can evaluate the consistency of generated email drafts across different enquiry categories, including software enquiries, pricing requests, support enquiries, and general business automation requirements.
 
-`modules/ai_service.py` – `generate_followup_draft()`
-
-Database and application tests:
-
+**Evidence:**
+- `modules/ai_service.py`
 - `test_followup.py`
 - `test_followup_db.py`
 - `test_followup_failure.py`
 
 ---
 
-## 4. Overall Prompt Engineering Summary
+## 5. Prompt Engineering Techniques Applied
 
-| Prompt | Objective | Result |
+The development of LeadFlow AI involved the following prompt engineering techniques.
+
+### 5.1 Role-Based Prompting
+
+Defined specific AI responsibilities:
+
+- Lead analysis assistant for customer enquiry analysis.
+- Business communication assistant for follow-up email generation.
+
+This helped establish the intended role and output expectations for each task.
+
+### 5.2 Context-Based Prompting
+
+Provided customer information, original enquiries, and relevant AI-generated analysis as context.
+
+This enabled the model to generate responses related to the actual customer requirement.
+
+### 5.3 Task Decomposition
+
+Divided complex lead analysis into smaller, clearly defined tasks:
+
+- Category identification.
+- Requirement summarisation.
+- Intent identification.
+- Priority classification.
+- Reasoning.
+- Missing-information identification.
+
+This made the expected analysis structure explicit.
+
+### 5.4 Structured Output Prompting
+
+Required the lead analysis function to return JSON with six predefined fields.
+
+This allowed the Python application to parse and validate the AI response before using it.
+
+### 5.5 Constraint-Based Prompting
+
+Introduced explicit restrictions against:
+
+- Inventing facts.
+- Assuming confirmed purchases.
+- Inferring unsupported urgency.
+- Inventing product features or pricing.
+- Making unverified business commitments.
+- Revealing internal lead information.
+
+These constraints were particularly important in the follow-up generation workflow.
+
+### 5.6 Iterative Prompt Refinement
+
+Reviewed the initial follow-up generation and identified unsupported product claims and commitments.
+
+The refined prompt introduced stronger source-grounding rules, accuracy constraints, and instructions to request clarification when information was missing.
+
+### 5.7 Output Validation
+
+The lead analysis response was checked for:
+
+- Valid JSON structure.
+- Required fields.
+- Allowed category values.
+- Allowed priority values.
+- Expected text and list data types.
+
+This provided an additional validation layer beyond the prompt instructions.
+
+### 5.8 Human-in-the-Loop Design
+
+Follow-up emails were generated as drafts for human review.
+
+The application does not automatically send AI-generated emails or treat AI-generated lead priority as a confirmed business decision.
+
+---
+
+## 6. Overall Prompt Engineering Summary
+
+| Prompt / Iteration | Objective | Observed Result |
 |---|---|---|
 | P-001 | Verify Gemini API connectivity | Expected confirmation received |
 | P-002 | Analyse and classify customer leads | Structured JSON generated and validated |
 | P-003 – Iteration 1 | Generate personalised follow-up emails | Unsupported product claims and commitments observed |
-| P-003 – Iteration 2 | Improve accuracy and relevance of follow-up emails | Refined, enquiry-focused draft generated |
+| P-003 – Iteration 2 | Improve accuracy and relevance of follow-up emails | More relevant, enquiry-focused draft generated |
 
-### Prompt Engineering Techniques Applied
+### Key Development Learnings
 
-**1. Role-based prompting**
+The development and testing process demonstrated several important lessons:
 
-Defined the responsibility of Gemini as a lead analysis assistant and business communication assistant.
-
-**2. Context-based prompting**
-
-Provided customer information and the original enquiry to generate relevant responses.
-
-**3. Task decomposition**
-
-Separated lead analysis into category identification, summarisation, intent identification, priority assignment, reasoning, and missing-information identification.
-
-**4. Structured output prompting**
-
-Required valid JSON with predefined fields for lead analysis, enabling the Python application to parse and validate the response.
-
-**5. Constraint-based prompting**
-
-Added explicit rules to prevent invented facts, unsupported product capabilities, unverified pricing, and false business commitments.
-
-**6. Iterative prompt refinement**
-
-Reviewed the first follow-up generation, identified unsupported claims, and strengthened the prompt with accuracy and trust requirements.
-
-**7. Output validation**
-
-Validated the AI-generated JSON structure, required fields, categories, priorities, and data types before returning the analysis to the application.
-
-**8. Human-in-the-loop design**
-
-Kept follow-up emails as drafts for human review rather than automatically sending customer communications.
+1. A clearly defined AI role and business context help establish the expected behaviour.
+2. Breaking a complex task into smaller instructions makes the expected output easier to validate.
+3. Structured JSON output supports integration between AI services and application logic.
+4. A professional-sounding response is not necessarily an accurate response.
+5. The original customer enquiry should remain the primary source of truth when generating customer-facing communication.
+6. Prompt instructions should be supported by application-level validation and error handling.
+7. Human review is important before AI-generated customer communication is used.
 
 ---
 
-## 5. Final Outcome
+## 7. Final Outcome
 
-The prompt engineering process helped transform LeadFlow AI from a basic Gemini API integration into an application that can analyse customer enquiries, classify leads, identify missing information, and prepare personalised follow-up email drafts.
+The prompt engineering process helped transform LeadFlow AI from a basic Gemini API integration into an application that supports:
 
-The development process demonstrated the importance of not only generating AI responses, but also defining clear instructions, evaluating actual outputs, identifying limitations, refining prompts, and validating results before using them in an application.
+- Customer enquiry analysis.
+- Business requirement identification.
+- Lead category and priority classification.
+- Identification of missing customer information.
+- Personalised follow-up email draft generation.
+- Structured AI response validation.
+- Human-reviewed customer communication.
+
+The project demonstrates the practical use of prompt engineering within a working Python application, including prompt design, testing, evaluation, refinement, and integration with database-backed application functionality.
 
 **Core principle:** AI-generated information should remain grounded in the customer's actual enquiry, while business decisions and customer communications remain under human control.
+
+---
+
+## 8. Project Evidence and References
+
+| Evidence | Project file |
+|---|---|
+| Gemini connectivity test | `test_gemini.py` |
+| Lead analysis implementation | `modules/ai_service.py` |
+| Lead analysis test | `test_ai.py` |
+| Lead analysis database persistence | `test_db_analysis.py` |
+| Follow-up generation test | `test_followup.py` |
+| Follow-up database persistence | `test_followup_db.py` |
+| Follow-up failure-handling test | `test_followup_failure.py` |
+| Application interface | `app.py` |
+| Project setup and execution | `README.md` |
+
+**Project Repository:**  
+https://github.com/priyavellanki216/LeadFlowAI
+
+**Document:** `prompts/prompt_log.md`
