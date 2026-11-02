@@ -1,71 +1,100 @@
 # LeadFlow AI
+### AI-Powered Lead Management & Follow-Up Automation System
 
-**AI-Powered Lead Management & Follow-Up Automation System**
+LeadFlow AI is a Python-based application that uses Google's Gemini API to analyse customer enquiries, identify potential business opportunities, prioritise leads, and generate personalised follow-up email drafts.
 
-LeadFlow AI is a Python-based business automation application that helps capture customer enquiries, analyse potential leads using Google's Gemini AI, and generate personalised follow-up email drafts.
-
-The application combines a Streamlit dashboard, an SQLite database, and Gemini-powered AI workflows to organise customer enquiries and support follow-up activities.
+The application combines a Streamlit interface, SQLite database, and AI-powered workflows to help organise customer enquiries and support consistent follow-up management.
 
 ## Project Overview
 
-Managing customer enquiries manually can make it difficult to organise incoming leads, understand customer requirements, and prepare timely follow-ups.
+Managing customer enquiries manually can make it difficult to understand customer requirements, identify promising opportunities, and prepare relevant follow-ups.
 
-LeadFlow AI addresses this workflow by providing a central application to:
+LeadFlow AI addresses this workflow through a central application that allows users to:
 
 - Capture and store customer enquiries.
-- Analyse enquiries using Gemini AI.
-- Classify leads by category and priority.
-- Identify customer intent and missing information.
+- Analyse enquiries using Google Gemini.
+- Identify customer intent and enquiry category.
+- Assign Hot, Warm, or Cold lead priorities.
+- Explain priority decisions using enquiry evidence.
+- Identify missing customer information.
 - Generate personalised follow-up email drafts.
-- Save generated drafts and maintain follow-up history.
-- Review customer enquiries and AI analysis through a dashboard.
+- Search, filter, edit, and manage leads through a dashboard.
+- Maintain a history of generated follow-up drafts.
 
-AI-generated content is intended for human review. The application does not automatically send emails to customers.
+**Important:** AI-generated content is provided as a draft for human review. The application does not automatically send emails.
 
-## Features
+## Key Features
 
 ### 1. Customer Enquiry Management
-- Capture customer name, email address, company name, and enquiry.
+
+- Capture customer name, email address, company, and enquiry.
 - Validate required fields and basic email format.
-- Store submitted enquiries in an SQLite database.
-- Preserve submitted enquiries independently of AI analysis.
+- Store submitted enquiries in SQLite.
+- Preserve submitted leads even when AI analysis is unsuccessful.
 
 ### 2. AI-Powered Lead Analysis
-- Analyse customer enquiries using Google's Gemini API.
-- Identify lead category and priority.
-- Generate an enquiry summary.
-- Identify customer intent.
-- Explain the AI assessment.
-- Identify missing information that may need clarification.
-- Retry AI analysis for previously saved enquiries.
 
-### 3. AI Follow-Up Draft Generation
-- Generate personalised follow-up email drafts using Gemini AI.
-- Use the original customer enquiry and available AI analysis as context.
+Gemini analyses the original customer enquiry and produces structured information:
+
+- **Category:** Software, Healthcare Technology, Automation, Pricing, Support, or Other.
+- **Summary:** A concise description of the customer's requirements.
+- **Intent:** The customer's apparent interest or business objective.
+- **Priority:** Hot, Warm, or Cold.
+- **Reasoning:** Evidence supporting the assigned priority.
+- **Missing information:** Details that may need clarification.
+
+The application validates the generated response against a Pydantic schema before using it.
+
+### 3. Personalised Follow-Up Draft Generation
+
+- Generate context-aware follow-up email drafts.
+- Use the original enquiry and available AI analysis as context.
+- Include a relevant subject line and professional email structure.
+- Avoid unsupported product claims, prices, timelines, or commitments.
 - Save generated drafts in the database.
 - Regenerate drafts when required.
 - Preserve earlier drafts through follow-up history.
-- Display drafts for human review.
 
-### 4. Lead Dashboard
-- Display submitted customer enquiries.
-- Show total enquiry count.
-- Summarise Hot, Warm, Cold, and Unclassified leads.
-- Display individual customer information and AI analysis.
-- Review saved follow-up drafts and their history.
+Generated drafts are displayed for human review and are not automatically emailed.
+
+### 4. Lead Dashboard and Management
+
+- Display stored customer enquiries.
+- Search leads by customer name, email, or company.
+- Filter leads by priority, category, and status.
+- View customer information and AI analysis.
+- Edit customer information.
+- Manage lead statuses:
+  - New
+  - Contacted
+  - Qualified
+  - Converted
+  - Lost
+- Review saved follow-up drafts and previous draft history.
+
+### 5. AI Failure Handling and Reliability
+
+- Separate lead persistence from AI analysis.
+- Preserve submitted enquiries when AI analysis fails.
+- Retry eligible API requests using configured retry handling.
+- Use a fallback model for eligible API failures.
+- Validate AI-generated JSON and required fields.
+- Handle follow-up generation failures without treating an unsaved draft as successful.
 
 ## Technology Stack
 
 | Component | Technology |
 |---|---|
-| Programming Language | Python |
-| User Interface | Streamlit |
-| AI Integration | Google Gemini API |
-| AI SDK | google-genai |
+| Programming language | Python |
+| User interface | Streamlit |
+| Generative AI | Google Gemini API |
+| Gemini SDK | google-genai |
+| Data validation | Pydantic |
 | Database | SQLite |
-| Data Processing | Pandas |
-| Environment Configuration | python-dotenv |
-| Development Environment | Visual Studio Code |
+| Data processing | Pandas |
+| Environment configuration | python-dotenv |
+| Automated testing | Pytest |
+| Development environment | Visual Studio Code |
 
 ## Project Structure
 
@@ -83,69 +112,64 @@ LeadFlowAI/
 │
 ├── modules/
 │   ├── __init__.py
-│   └── ai_service.py
+│   ├── ai_service.py
+│   └── lead_service.py
 │
 ├── prompts/
 │   └── prompt_log.md
 │
-├── test_ai.py
-├── test_db_analysis.py
-├── test_followup.py
-├── test_followup_db.py
-├── test_ai_failure.py
-├── test_followup_failure.py
-├── test_gemini.py
-├── test_gemini_alternative.py
-├── verify_db.py
-└── verify_leads.py
+└── tests/
+    ├── test_database.py
+    ├── test_ai_service.py
+    └── test_lead_service.py
 ```
 
-The `.env` file, virtual environment, and SQLite database are created and maintained locally. They are excluded from the public repository.
-
-## Prerequisites
-
-- Python 3.12 or compatible Python 3 version.
-- A Google Gemini API key.
-- Visual Studio Code or another Python development environment.
-- Internet connectivity for Gemini API requests.
+The `.env` file, Python virtual environment, and local SQLite database are maintained locally and excluded from Git.
 
 ## Installation and Setup
 
+### Prerequisites
+
+- Python 3.12 or a compatible Python 3 version.
+- A Google Gemini API key.
+- Internet access for Gemini API requests.
+- Git.
+- Windows PowerShell or another terminal.
+
 ### 1. Clone the repository
 
-```bash
-git clone https://github.com/priyavellanki216/LeadFlowAI
+```powershell
+git clone https://github.com/priyavellanki216/LeadFlowAI.git
 cd LeadFlowAI
 ```
 
-Replace `https://github.com/priyavellanki216/LeadFlowAI` with the actual repository URL after publishing the project.
+### 2. Create and activate a virtual environment
 
-### 2. Create a virtual environment
-
-**Windows PowerShell:**
+Windows PowerShell:
 
 ```powershell
 python -m venv .venv
-.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 ```
 
 ### 3. Install dependencies
 
 ```powershell
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
 ### 4. Configure the Gemini API key
 
-Create a `.env` file in the project root directory:
+Create a `.env` file in the project root:
 
-```text
+```env
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 Replace the placeholder with your own Gemini API key.
 
-**Security:** Never commit your `.env` file or expose your API key in source code, screenshots, documentation, or public repositories.
+**Security:** Never commit `.env` or expose API credentials in source code, documentation, screenshots, or public repositories.
 
 ### 5. Run the application
 
@@ -153,69 +177,107 @@ Replace the placeholder with your own Gemini API key.
 python -m streamlit run app.py
 ```
 
-Streamlit will display a local application address in the terminal. Open that address in your browser.
+Open the local Streamlit URL displayed in your terminal.
 
 ## Application Workflow
 
-1. Enter customer information and the original enquiry.
-2. Submit the enquiry through the Streamlit form.
-3. The application validates and saves the enquiry in SQLite.
-4. Gemini AI analyses the saved enquiry.
-5. The AI analysis is stored against the corresponding lead.
-6. Review the lead information, category, priority, summary, intent, reasoning, and missing information.
+1. Enter customer details and the original enquiry.
+2. Submit the enquiry through the Streamlit interface.
+3. Validate and save the lead in SQLite.
+4. Send the enquiry to Gemini for analysis.
+5. Validate and persist the structured AI analysis.
+6. Review the category, summary, intent, priority, reasoning, and missing information.
 7. Generate a personalised follow-up email draft.
-8. Save the draft and its history in SQLite.
-9. Review previous drafts and regenerate when needed.
+8. Save and review the generated draft.
+9. Search, filter, edit, and update the lead's status through the dashboard.
 
-## Testing and Verification
+## Prompt Engineering and Iterative Improvement
 
-The project includes individual scripts used during development to verify:
+Prompt engineering is a central part of this project.
 
-- Gemini API connectivity.
-- AI lead analysis.
-- Database initialization and lead persistence.
-- AI analysis storage and retrieval.
-- Follow-up draft generation.
-- Follow-up draft storage and history retrieval.
-- Lead preservation during a simulated AI analysis failure.
-- Previous draft and history preservation during a simulated follow-up generation failure.
+The implementation uses separate prompts for lead analysis and follow-up email generation.
 
-The failure-handling scripts use controlled simulated exceptions. They verify the relevant database-preservation behaviour and should not be interpreted as live Gemini outage tests.
+Key design decisions include:
 
-To run an individual verification script:
+- Grounding analysis in the customer's original enquiry.
+- Treating customer-provided text as untrusted input.
+- Instructing the model not to follow embedded instructions.
+- Restricting categories and priority values.
+- Requiring evidence-based priority reasoning.
+- Preventing invented budgets, product features, prices, timelines, or guarantees.
+- Keeping internal lead priority and AI reasoning out of customer-facing emails.
+- Requiring concise, professionally structured follow-up drafts.
+
+The prompt development history, refinements, and evaluation notes are documented in:
+
+`prompts/prompt_log.md`
+
+## Automated Testing
+
+The project includes automated tests for the core application components.
+
+Run the complete test suite from the project root:
 
 ```powershell
-python test_ai_failure.py
+python -m pytest tests -v
 ```
 
-Use the relevant test filename for other verification scripts.
+Compile-check the main application modules:
 
-## Prompt Engineering Documentation
+```powershell
+python -m py_compile app.py database\db.py modules\ai_service.py modules\lead_service.py
+```
 
-The `prompts/prompt_log.md` file records the prompts used during development, significant refinements, observed AI responses, and evaluation notes.
+The automated tests cover the database, AI service, and lead-processing functionality. Tests should be run in the configured Python environment with the project's dependencies installed.
 
-It documents the iterative process used to improve AI-generated lead analysis and follow-up drafts, including efforts to reduce unsupported claims and keep generated content grounded in the customer's original enquiry.
+## Error Handling and Data Integrity
 
-## Limitations
+LeadFlow AI is designed to preserve important customer information even when an external AI request fails.
 
-- AI analysis and follow-up generation depend on Gemini API availability.
-- AI-generated classifications and content may require human review.
-- Email drafts are generated and stored; automatic email delivery is not implemented.
-- The application currently uses a local SQLite database.
-- The project is designed as a development prototype and is not presented as a production-deployed service.
+The lead-processing workflow:
 
-## Security
+1. Saves the customer enquiry.
+2. Attempts AI analysis.
+3. Validates the returned response.
+4. Stores the analysis separately.
+5. Reports AI or persistence failures without silently treating them as successful operations.
+
+This separation helps prevent an AI service failure from automatically discarding an already submitted lead.
+
+## Security and Responsible AI Considerations
 
 - API credentials are loaded through environment variables.
 - `.env` is excluded from Git tracking.
-- The local SQLite database is excluded from the public repository.
-- AI-generated follow-up drafts require human review before use.
+- The local database is excluded from the public repository.
+- Customer enquiries are treated as untrusted input in AI prompts.
+- Structured AI responses are validated before use.
+- AI-generated customer communication requires human review.
+- The application does not automatically send emails.
+
+## Current Limitations
+
+- AI functionality depends on Gemini API availability and valid credentials.
+- AI-generated analysis may require human review.
+- Follow-up emails are generated and stored as drafts; automatic email delivery is not implemented.
+- The application currently uses a local SQLite database.
+- The project is a development prototype and is not presented as a production-deployed service.
+
+## Project Links
+
+**GitHub Repository:**  
+https://github.com/priyavellanki216/LeadFlowAI
+
+**Prompt Documentation:**  
+`prompts/prompt_log.md`
+
+**Technology:** Python, Streamlit, SQLite, Google Gemini API
 
 ## Project Objective
 
-LeadFlow AI demonstrates how generative AI, prompt engineering, Python application development, and database integration can be combined to improve a practical business workflow.
+LeadFlow AI demonstrates the practical application of generative AI, prompt engineering, Python development, structured response validation, database integration, and workflow automation to address a real-world business problem.
 
-**Project:** LeadFlow AI  
-**Domain:** Technology / Business Automation  
-**AI Platform:** Google Gemini  
-**Interface:** Streamlit
+The goal is to make customer enquiry management more organised and help users prepare relevant, context-aware follow-ups while keeping important decisions under human review.
+
+---
+
+**Developed as an AI application project by Lakshmi Priya.**
