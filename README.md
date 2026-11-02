@@ -114,11 +114,11 @@ The `.env` file, virtual environment, and SQLite database are created and mainta
 ### 1. Clone the repository
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+git clone https://github.com/priyavellanki216/LeadFlowAI
 cd LeadFlowAI
 ```
 
-Replace `YOUR_GITHUB_REPOSITORY_URL` with the actual repository URL after publishing the project.
+Replace `https://github.com/priyavellanki216/LeadFlowAI` with the actual repository URL after publishing the project.
 
 ### 2. Create a virtual environment
 
